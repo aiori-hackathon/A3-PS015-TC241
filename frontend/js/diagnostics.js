@@ -41,7 +41,6 @@ async function runBrowserDiagnostics() {
         browser_error: null
     };
 
-    try {
         measurements.http_reachable = null;
 measurements.http_response_time_ms = null;
 measurements.browser_error = "BROWSER_PROBE_SKIPPED_CORS";
