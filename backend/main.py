@@ -103,13 +103,14 @@ def receive_diagnostics(data: BrowserDiagnostics):
             detail="Enter a valid hostname."
         )
 
-    validate_public_hostname(hostname)
+    validated_ips = validate_public_hostname(hostname)
+    target_ip = sorted(validated_ips)[0]
 
     try:
-        network = check_hostname(hostname, port=443)
+        network = check_hostname(hostname, port=443, target_ip=target_ip)
         dns = measure_dns_response(hostname)
-        tcp = measure_tcp_latency(hostname, port=443, count=5)
-        icmp = measure_icmp_packet_loss(hostname, count=4)
+        tcp = measure_tcp_latency(hostname, port=443, count=5, target_ip=target_ip)
+        icmp = measure_icmp_packet_loss(hostname, count=4, target_ip=target_ip)
 
         diagnosis = diagnose_network(network, dns, tcp, icmp)
 

@@ -6,13 +6,15 @@ import time
 import re
 
 
-def check_hostname(hostname="google.com", port=443, timeout=3):
-    """Check TCP connectivity and measure connection time."""
+def check_hostname(hostname="google.com", port=443, timeout=3,
+                   target_ip=None):
+    """Check TCP connectivity using a validated IP when provided."""
     start = time.perf_counter()
+    connection_target = target_ip or hostname
 
     try:
         with socket.create_connection(
-            (hostname, port), timeout=timeout
+            (connection_target, port), timeout=timeout
         ):
             latency_ms = (time.perf_counter() - start) * 1000
 
@@ -72,15 +74,18 @@ def measure_dns_response(hostname="google.com"):
             "resolved_addresses": [],
             "error": str(exc),
         }
-
-
 def measure_tcp_latency(hostname="google.com", port=443,
-                        count=5, timeout=3):
+                        count=5, timeout=3, target_ip=None):
     """Measure repeated TCP connection times."""
+    if count < 1:
+        raise ValueError("count must be at least 1")
+
     results = []
 
     for _ in range(count):
-        result = check_hostname(hostname, port, timeout)
+        result = check_hostname(
+            hostname, port, timeout, target_ip=target_ip
+        )
         results.append(result["latency_ms"])
         time.sleep(0.2)
 
@@ -93,13 +98,10 @@ def measure_tcp_latency(hostname="google.com", port=443,
         "attempts": count,
         "successful_attempts": len(successful),
         "failed_attempts": failed,
-        "tcp_probe_failure_percent": round(
-            failed / count * 100, 2
-        ) if count else None,
+        "tcp_probe_failure_percent": round(failed / count * 100, 2),
         "latency_samples_ms": results,
-        "average_latency_ms": round(
-            sum(successful) / len(successful), 2
-        ) if successful else None,
+        "average_latency_ms": round(sum(successful) / len(successful), 2)
+        if successful else None,
         "min_latency_ms": round(min(successful), 2)
         if successful else None,
         "max_latency_ms": round(max(successful), 2)
@@ -107,22 +109,25 @@ def measure_tcp_latency(hostname="google.com", port=443,
     }
 
 
-def measure_icmp_packet_loss(hostname="google.com", count=4):
-    """Measure ICMP echo results using the system ping command."""
-    if count < 1:
-        raise ValueError("count must be at least 1")
+def measure_icmp_packet_loss(hostname="google.com", count=4,
+                             target_ip=None):
+    """Measure ICMP packet loss against a validated IP."""
+    if count < 1 or count > 4:
+        raise ValueError("count must be between 1 and 4")
+
+    ping_target = target_ip or hostname
 
     if platform.system() == "Windows":
-        command = ["ping", "-n", str(count), "-w", "1000", hostname]
+        command = ["ping", "-n", str(count), "-w", "1000", ping_target]
     else:
-        command = ["ping", "-c", str(count), hostname]
+        command = ["ping", "-c", str(count), "-W", "1", ping_target]
 
     try:
         completed = subprocess.run(
             command,
             capture_output=True,
             text=True,
-            timeout=count * 2 + 5,
+            timeout=count * 2 + 3,
             errors="replace",
         )
         output = completed.stdout + "\n" + completed.stderr
@@ -130,8 +135,9 @@ def measure_icmp_packet_loss(hostname="google.com", count=4):
         if platform.system() == "Windows":
             match = re.search(r"\((\d+)%\s*loss\)", output, re.I)
         else:
-            match = re.search(r"(\d+(?:\.\d+)?)%\s*packet loss",
-                              output, re.I)
+            match = re.search(
+                r"(\d+(?:\.\d+)?)%\s*packet loss", output, re.I
+            )
 
         if not match:
             return {
