@@ -1,3 +1,18 @@
+## AIORI-3 Hackathon Progress
+
+**Team:** CONNECTIQ  
+**Problem Statement:** PS-015, Explainable Home and Last-Mile Connectivity Diagnosis  
+**Repository:** A3-PS015-TC241
+
+### Progress
+- Steps 1–7: Completed
+- Step 8: Mentoring session attended
+- GitHub repository: Updated
+- Network diagnostic prototype: Under development
+
+### Main Presentation
+
+[View CONNECTIQ AIORI-3 PS-015 Presentation](CONNECTIQ-AIORI3-PS015-Presentation.pdf)
 
 # CONNECTIQ
 
