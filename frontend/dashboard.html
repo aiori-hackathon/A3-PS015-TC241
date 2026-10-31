@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONNECTIQ | Diagnostic Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard {
+            max-width: 1100px;
+            margin: 55px auto;
+            padding: 0 24px;
+        }
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+        .dashboard-header h1 {
+            font-size: 34px;
+        }
+        .dashboard-header p {
+            color: var(--muted);
+        }
+        .connection-status {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 7px 13px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .connected { background: #14532d; color: #86efac; }
+        .disconnected { background: #7f1d1d; color: #fecaca; }
+        .diagnostic-panel, .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 22px;
+        }
+        .diagnostic-panel label {
+            display: block;
+            margin-bottom: 9px;
+            font-weight: 600;
+        }
+        .diagnostic-panel input {
+            width: 100%;
+            padding: 13px;
+            background: #08111f;
+            color: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 18px;
+        }
+        .diagnostic-panel button {
+            border: 0;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .diagnostic-panel button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        .metric-value {
+            color: var(--primary);
+            font-size: 25px;
+            font-weight: 700;
+            margin-top: 12px;
+        }
+        .result-card p {
+            color: var(--muted);
+            margin-top: 8px;
+        }
+        #diagnosis-message {
+            margin-top: 15px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        .back-link {
+            color: var(--primary);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        @media(max-width: 650px) {
+            .metrics { grid-template-columns: 1fr; }
+        }
+
+        .report-panel #report-status,
+        .report-panel #report-filename {
+            margin: 12px 0;
+            color: var(--muted);
+        }
+
+        #download-report {
+            display: inline-block;
+            margin-top: 12px;
+            text-decoration: none;
+        }
+
+        #download-report[hidden] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">C</span>
+            CONNECTIQ
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+        <a href="index.html" class="back-link">← Back to Home</a>
+
+        <div class="dashboard-header">
+            <span class="tag">NETWORK INTELLIGENCE</span>
+            <h1>Network Diagnostic Dashboard</h1>
+            <p>Measure browser-permitted connectivity and analyze the results.</p>
+            <div id="backend-status" class="connection-status disconnected">
+                Checking backend...
+            </div>
+        </div>
+
+        <section class="diagnostic-panel">
+            <h2>Start a diagnostic test</h2>
+            <p style="color:var(--muted); margin:10px 0 22px;">
+                Enter a hostname to test browser-accessible HTTP connectivity.
+            </p>
+
+            <label for="hostname">Target hostname</label>
+            <input id="hostname" type="text" value="example.com"
+                   placeholder="example.com">
+
+            <button id="start-diagnosis" class="primary-button">
+                Start Diagnosis →
+            </button>
+
+            <p id="test-status" role="status" aria-live="polite"
+               style="margin-top:15px;color:var(--muted);"></p>
+        </section>
+
+        <section class="metrics">
+            <article class="result-card">
+                <span>HTTP Reachability</span>
+                <div class="metric-value" id="reachability">--</div>
+            </article>
+
+            <article class="result-card">
+                <span>HTTP Response Time</span>
+                <div class="metric-value" id="response-time">--</div>
+            </article>
+
+            <article class="result-card">
+                <span>Diagnosis Status</span>
+                <div class="metric-value" id="diagnosis-status">--</div>
+            </article>
+
+            <article class="result-card">
+                <span>Overall Severity</span>
+                <div class="metric-value" id="diagnosis-severity">--</div>
+            </article>
+        </section>
+
+        <section class="metrics" style="margin-top:22px;">
+            <article class="result-card">
+                <span>TCP Connectivity</span>
+                <div class="metric-value" id="network-status">--</div>
+                <p id="network-latency">--</p>
+            </article>
+
+            <article class="result-card">
+                <span>DNS Resolution</span>
+                <div class="metric-value" id="dns-status">--</div>
+                <p id="dns-time">--</p>
+            </article>
+
+            <article class="result-card">
+                <span>TCP Attempts</span>
+                <div class="metric-value" id="tcp-status">--</div>
+                <p>Average: <span id="tcp-average">--</span></p>
+                <p>Minimum: <span id="tcp-min">--</span></p>
+                <p>Maximum: <span id="tcp-max">--</span></p>
+            </article>
+
+            <article class="result-card">
+                <span>ICMP Packet Loss</span>
+                <div class="metric-value" id="icmp-status">--</div>
+                <p id="packet-loss">--</p>
+            </article>
+        </section>
+
+        <section class="result-card" style="margin-top:22px;">
+            <h2>Diagnostic Findings</h2>
+            <div id="diagnostic-findings">
+                <p>Findings will appear after diagnosis.</p>
+            </div>
+        </section>
+
+        <section class="result-card" style="margin-top:22px;">
+            <h2>Diagnostic Limitations</h2>
+            <ul id="diagnostic-limitations">
+                <li>Limitations will appear after diagnosis.</li>
+            </ul>
+        </section>
+
+        <section class="result-card" style="margin-top:22px;">
+            <h2>Diagnostic Explanation</h2>
+            <p id="diagnosis-message">
+                Start a diagnostic test to view the results.
+            </p>
+        </section>
+
+        <section class="result-card">
+            <h2>Measurement Limitations</h2>
+            <p>
+                Browser-based tests do not provide raw ICMP ping,
+                packet loss, direct DNS timing or gateway diagnostics.
+                These measurements require other permitted methods.
+            </p>
+        </section>
+    </main>
+
+        <section class="result-card report-panel" style="margin-top:22px;">
+            <h2>Diagnostic Report</h2>
+            <p id="report-status">No report generated yet.</p>
+            <p id="report-filename">Report filename: --</p>
+            <a id="download-report" class="primary-button"
+               href="#" hidden>
+                Download Latest Report
+            </a>
+        </section>
+    <footer>
+        <span>© 2026 CONNECTIQ</span>
+        <span>AIORI-3 | Team CONNECTIQ</span>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/diagnostics.js"></script>
+</body>
+</html>
+
+
+
