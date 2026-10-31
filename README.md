@@ -1,4 +1,8 @@
-# CONNECTIQ
+CONNECTIQ Live Website
+
+Access our deployed network diagnostics dashboard:
+
+🌐 Live Demo: https://a3-ps015-tc241.onrender.com# CONNECTIQ
 ### Explainable Home and Last-Mile Connectivity Diagnosis
 
 **AIORI-3 Hackathon | Problem Statement: PS-015**
