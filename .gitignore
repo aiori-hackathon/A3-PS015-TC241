@@ -6,3 +6,7 @@ venv/
 .pytest_cache/
 .streamlit/secrets.toml
 reports/*.json
+# Local backups and test artifacts
+*_backup.py
+*_backup.js
+connectiq_test_report.json
