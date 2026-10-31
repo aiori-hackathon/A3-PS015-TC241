@@ -42,31 +42,9 @@ async function runBrowserDiagnostics() {
     };
 
     try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
-        const startTime = performance.now();
-
-        try {
-            const response = await fetch(`https://${hostname}/`, {
-                method: "GET",
-                mode: "cors",
-                cache: "no-store",
-                signal: controller.signal
-            });
-
-            measurements.http_response_time_ms =
-                Number((performance.now() - startTime).toFixed(2));
-
-            measurements.http_reachable = response.ok;
-        } finally {
-            clearTimeout(timeout);
-        }
-    } catch (error) {
-        measurements.browser_error =
-            error.name === "AbortError"
-                ? "TIMEOUT"
-                : "CORS_OR_NETWORK_ERROR";
-    }
+        measurements.http_reachable = null;
+measurements.http_response_time_ms = null;
+measurements.browser_error = "BROWSER_PROBE_SKIPPED_CORS";
 
     if (measurements.http_reachable === true) {
         reachability.textContent = "HTTP Reachable";
@@ -237,6 +215,7 @@ function setText(id, value) {
 function formatMs(value) {
     return value == null ? "Unavailable" : `${value} ms`;
 }
+
 
 
 
