@@ -3,8 +3,17 @@
 
 **AIORI-3 Hackathon | PS-015 | Team CONNECTIQ**
 
-## 1. Project Overview
+## Project Resources
 
+| Resource | Link |
+|---|---|
+| Live Website | [CONNECTIQ Website](https://a3-ps015-tc241.onrender.com) |
+| Live Dashboard | [Open Dashboard](https://a3-ps015-tc241.onrender.com/dashboard.html) |
+| API Documentation | [FastAPI Swagger UI](https://a3-ps015-tc241.onrender.com/docs) |
+| GitHub Repository | [Source Code](https://github.com/aiori-hackathon/A3-PS015-TC241) |
+| YouTube Explanation and Team Introduction | [Watch Video](https://youtu.be/hRFXhNkGtXE) |
+| Project Demonstration Video | Coming soon |
+## 1. Project Overview
 CONNECTIQ is a web-based network diagnostic platform designed to identify and explain connectivity problems in home and last-mile networks.
 
 It performs active network probing, collects network telemetry, and applies deterministic rule-based inference to identify potential connectivity faults.
