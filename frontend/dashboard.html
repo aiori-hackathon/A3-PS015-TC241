@@ -103,7 +103,56 @@
         #download-report[hidden] {
             display: none;
         }
-    </style>
+    
+.simulation-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.simulation-option {
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #08111f;
+    color: white;
+    cursor: pointer;
+    text-align: left;
+}
+
+.simulation-option.selected {
+    border: 2px solid var(--primary);
+}
+
+.simulation-option strong {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.simulation-option span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+#simulation-results {
+    margin-top: 22px;
+}
+
+.simulation-finding {
+    border-left: 4px solid #ef4444;
+    padding: 14px;
+    margin: 14px 0;
+    background: #111827;
+    border-radius: 6px;
+}
+
+@media(max-width: 650px) {
+    .simulation-options {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
 <body>
     <header class="navbar">
@@ -198,6 +247,48 @@
         </section>
 
         <section class="result-card" style="margin-top:22px;">
+        <section class="diagnostic-panel">
+            <h2>Simulation Testing</h2>
+            <p style="color:var(--muted); margin:10px 0;">
+                Test the diagnosis engine using controlled fault scenarios.
+                These are simulated measurements, not live network faults.
+            </p>
+
+            <div class="simulation-options">
+                <button class="simulation-option selected" data-scenario="dns_failure">
+                    <strong>DNS Failure</strong>
+                    <span>Simulate hostname resolution failure</span>
+                </button>
+
+                <button class="simulation-option" data-scenario="tcp_failure">
+                    <strong>TCP Failure</strong>
+                    <span>Simulate failed TCP connections</span>
+                </button>
+
+                <button class="simulation-option" data-scenario="packet_loss">
+                    <strong>Packet Loss</strong>
+                    <span>Simulate 60% ICMP packet loss</span>
+                </button>
+            </div>
+
+            <button id="run-simulation" class="primary-button">
+                Run Simulation →
+            </button>
+
+            <p id="simulation-status" role="status" aria-live="polite"
+               style="margin-top:15px;color:var(--muted);">
+                Select a scenario and run the simulation.
+            </p>
+
+            <div id="simulation-results" hidden>
+                <h3>Simulation Diagnosis</h3>
+                <p>Status: <strong id="sim-status">--</strong></p>
+                <p>Severity: <strong id="sim-severity">--</strong></p>
+                <p id="sim-summary"></p>
+                <h3>Evidence and Findings</h3>
+                <div id="sim-findings"></div>
+            </div>
+        </section>
             <h2>Diagnostic Findings</h2>
             <div id="diagnostic-findings">
                 <p>Findings will appear after diagnosis.</p>
@@ -245,8 +336,12 @@
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
     <script src="js/diagnostics.js"></script>
+    <script src="js/simulations.js"></script>
 </body>
 </html>
+
+
+
 
 
 

@@ -17,6 +17,7 @@ from src.network_probes import (
     measure_icmp_packet_loss,
 )
 from src.diagnostics import diagnose_network
+from backend.simulations import run_simulation
 from src.report_generator import save_report
 
 app = FastAPI(
@@ -83,6 +84,23 @@ def home():
 
 
 @app.get("/health")
+@app.get("/api/simulations")
+def get_simulation_scenarios():
+    return {
+        "available_scenarios": [
+            {"id": "dns_failure", "name": "DNS Failure"},
+            {"id": "tcp_failure", "name": "TCP Connection Failure"},
+            {"id": "packet_loss", "name": "Packet Loss"}
+        ]
+    }
+
+
+@app.post("/api/simulations/{scenario}")
+def simulate_network_fault(scenario: str):
+    try:
+        return run_simulation(scenario)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 def health():
     return {
         "status": "healthy",
