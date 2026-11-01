@@ -152,7 +152,9 @@ function displayFindings(findings) {
         const card = document.createElement("article");
         const heading = document.createElement("h3");
         const severity = document.createElement("p");
+        const confidence = document.createElement("p");
         const evidence = document.createElement("p");
+        const interpretation = document.createElement("p");
         const causesHeading = document.createElement("h4");
         const causesList = document.createElement("ul");
         const recommendationsHeading = document.createElement("h4");
@@ -160,9 +162,13 @@ function displayFindings(findings) {
 
         heading.textContent = finding.finding ?? "Diagnostic finding";
         severity.textContent = `Severity: ${finding.severity ?? "UNKNOWN"}`;
+        confidence.textContent = `Evidence confidence: ${finding.confidence ?? "UNKNOWN"}`;
         evidence.textContent = `Evidence: ${finding.evidence ?? "Unavailable"}`;
+        interpretation.textContent =
+            `Interpretation: ${finding.interpretation ?? "No interpretation available."}`;
 
         causesHeading.textContent = "Possible causes";
+
         (finding.possible_causes || []).forEach((cause) => {
             const item = document.createElement("li");
             item.textContent = cause;
@@ -170,6 +176,7 @@ function displayFindings(findings) {
         });
 
         recommendationsHeading.textContent = "Recommended actions";
+
         const recommendations = Array.isArray(finding.recommendation)
             ? finding.recommendation
             : [finding.recommendation].filter(Boolean);
@@ -183,7 +190,9 @@ function displayFindings(findings) {
         card.append(
             heading,
             severity,
+            confidence,
             evidence,
+            interpretation,
             causesHeading,
             causesList,
             recommendationsHeading,
@@ -214,8 +223,3 @@ function setText(id, value) {
 function formatMs(value) {
     return value == null ? "Unavailable" : `${value} ms`;
 }
-
-
-
-
-

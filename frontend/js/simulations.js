@@ -60,20 +60,40 @@
                 heading.textContent = finding.finding;
 
                 const severity = document.createElement("p");
-                severity.textContent = `Severity: ${finding.severity}`;
+                severity.textContent = `Severity: ${finding.severity ?? "UNKNOWN"}`;
+
+                const confidence = document.createElement("p");
+                confidence.textContent =
+                    `Evidence confidence: ${finding.confidence ?? "UNKNOWN"}`;
 
                 const evidence = document.createElement("p");
-                evidence.textContent = `Evidence: ${finding.evidence}`;
+                evidence.textContent = `Evidence: ${finding.evidence ?? "Unavailable"}`;
+
+                const interpretation = document.createElement("p");
+                interpretation.textContent =
+                    `Interpretation: ${finding.interpretation ?? "No interpretation available."}`;
 
                 const causes = document.createElement("p");
                 causes.textContent =
-                    `Possible causes: ${finding.possible_causes.join(", ")}`;
+                    `Possible causes: ${(finding.possible_causes || []).join(", ")}`;
 
                 const recommendations = document.createElement("p");
-                recommendations.textContent =
-                    `Recommendations: ${finding.recommendation.join(" ")}`;
+                const recommendationList = Array.isArray(finding.recommendation)
+                    ? finding.recommendation
+                    : [finding.recommendation].filter(Boolean);
 
-                card.append(heading, severity, evidence, causes, recommendations);
+                recommendations.textContent =
+                    `Recommendations: ${recommendationList.join(" ")}`;
+
+                card.append(
+                    heading,
+                    severity,
+                    confidence,
+                    evidence,
+                    interpretation,
+                    causes,
+                    recommendations
+                );
                 findings.appendChild(card);
             });
 
