@@ -312,9 +312,11 @@
         <section class="result-card">
             <h2>Measurement Limitations</h2>
             <p>
-                Browser-based tests do not provide raw ICMP ping,
-                packet loss, direct DNS timing or gateway diagnostics.
-                These measurements require other permitted methods.
+                Browser-based tests are limited by browser security
+                restrictions and do not provide raw ICMP ping, packet loss
+                or gateway-level diagnostics. Backend probes separately
+                measure DNS response time, TCP connectivity and ICMP packet
+                loss when the server supports these methods.
             </p>
         </section>
     </main>
@@ -339,6 +341,7 @@
     <script src="js/simulations.js"></script>
 </body>
 </html>
+
 
 
 
