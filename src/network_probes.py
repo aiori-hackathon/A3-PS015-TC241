@@ -1,4 +1,4 @@
-
+﻿
 import platform
 import socket
 import subprocess
@@ -122,6 +122,26 @@ def measure_icmp_packet_loss(hostname="google.com", count=4,
     else:
         command = ["ping", "-c", str(count), "-W", "1", ping_target]
 
+    # Check whether the ping executable is installed.
+    try:
+        subprocess.run(
+            [command[0], "-V"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+            errors="replace",
+        )
+    except FileNotFoundError:
+        return {
+            "host": hostname,
+            "status": "Unavailable",
+            "packet_loss_percent": None,
+            "error": "The ping executable is not installed on this server.",
+        }
+    except (OSError, subprocess.TimeoutExpired):
+        # Some ping implementations do not support -V.
+        pass
+
     try:
         completed = subprocess.run(
             command,
@@ -156,7 +176,21 @@ def measure_icmp_packet_loss(hostname="google.com", count=4,
             "error": None,
         }
 
-    except (OSError, subprocess.TimeoutExpired) as exc:
+    except FileNotFoundError:
+        return {
+            "host": hostname,
+            "status": "Unavailable",
+            "packet_loss_percent": None,
+            "error": "The ping executable is not installed on this server.",
+        }
+    except subprocess.TimeoutExpired:
+        return {
+            "host": hostname,
+            "status": "Unknown",
+            "packet_loss_percent": None,
+            "error": "The ICMP probe timed out.",
+        }
+    except OSError as exc:
         return {
             "host": hostname,
             "status": "Failed",
